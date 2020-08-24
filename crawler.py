@@ -13,7 +13,11 @@ class BrowserstackCrawler(object):
         if safari:
             self.browser = Safari()
         else:
-            self.browser = Chrome(executable_path='/Users/macbook/chromedriver')
+            # Open in headless mode
+            self.op = ChromeOptions()
+            self.op.add_argument('headless')
+            self.browser = Chrome(executable_path='/Users/macbook/chromedriver', options=self.op)
+        
         self.browser.get(BASE_URL + account)
 
     def find_signup_btn(self):
@@ -55,15 +59,19 @@ class BrowserstackCrawler(object):
 
     def get_posts(self):
         xpath_posts = '//*[@id="react-root"]/section/main/div/header/section/ul/li[1]/a'
-        return re.findall(r'\d+',self.browser.find_element_by_xpath(xpath_posts).text)[0]
+        return self.browser.find_element_by_xpath(xpath_posts).text
     
     def get_followers(self):
         xpath_followers = '//*[@id="react-root"]/section/main/div/header/section/ul/li[2]/a'
-        return re.findall(r'\d+',self.browser.find_element_by_xpath(xpath_followers).text)[0]
+        return self.browser.find_element_by_xpath(xpath_followers).text
 
     def get_following(self):
         xpath_following = '//*[@id="react-root"]/section/main/div/header/section/ul/li[3]/a'
-        return re.findall(r'\d+',self.browser.find_element_by_xpath(xpath_following).text)[0]
+        return self.browser.find_element_by_xpath(xpath_following).text
+    
+    def get_account_biography(self):
+        xpath_biography = '//*[@id="react-root"]/section/main/div/header/section/div[2]'
+        return self.browser.find_element_by_xpath(xpath_biography).text
 
     def get_all_posts(self):
         posts = []
