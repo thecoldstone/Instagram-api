@@ -1,5 +1,6 @@
 from selenium.webdriver import Safari, Chrome, ChromeOptions
 import time
+from requests import get
 import re
 
 BASE_URL = "https://www.instagram.com/"
@@ -16,6 +17,8 @@ class SeleniumCrawler(object):
             self.browser = Chrome(executable_path='/Users/macbook/chromedriver', options=self.op)
         
         self.browser.get(BASE_URL + usr)
+        self.status = get(BASE_URL + usr).status_code
+
 
     def get_posts(self):
         xpath_posts = '//*[@id="react-root"]/section/main/div/header/section/ul/li[1]/a'
