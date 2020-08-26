@@ -37,7 +37,7 @@ class Crawler:
         from Crawler.Method.bs4_crawler import crawl
         pass
 
-    def crawl_with_selenium(self, usr):
+    def crawl_with_selenium(self, usr, to_login=False):
         '''
 
         :param usr: username to crawl
@@ -49,13 +49,21 @@ class Crawler:
 
         selenium = SeleniumCrawler(usr)
 
+        if to_login is True:
+
+            selenium.logged_in, response = selenium.log_in('nike', 'sdad')
+
+            if selenium.logged_in is False and len(response) > 0:
+                return None, response['response']
+
         if selenium.status is not 200:
-            return None
+            return None, 'Username is not found.'
 
         return {
-            'username': usr, 
+            'username': usr,
             'posts': selenium.get_posts(),
             'followers': selenium.get_followers(),
             'following': selenium.get_following(),
-            'biography': selenium.get_account_biography() 
-        }
+            'biography': selenium.get_account_biography()
+            # 'post' : selenium.get_all_posts()
+        }, 'Successful'

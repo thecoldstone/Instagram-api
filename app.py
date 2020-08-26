@@ -7,7 +7,7 @@ app = Flask(__name__)
 def home():
     return render_template("blog/index.html")
 
-@app.route('/user/<string:username>')
+@app.route('/<string:username>')
 def index(username):
 
     crawler = Crawler('selenium')
@@ -17,12 +17,12 @@ def index(username):
         return "<h1>Crawling method does not exist</h1>"
 
     # Crawl Instagram username
-    result = crawler.crawl(username)
+    result, respond = crawler.crawl(username)
 
     if result is None:
         return jsonify({
             'response' : {
-                'error' : 'Username is not found.'
+                'error' : respond
             }
         }), 404
 
@@ -34,6 +34,7 @@ def index(username):
             'followers' : result['followers'],
             'following' : result['following'],
             'biography' : result['biography']
+            # 'post' : result['post']
         }
 
     }), 200
