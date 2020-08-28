@@ -18,6 +18,7 @@ class SeleniumCrawler(object):
             # Open in headless mode
             if headless is True:
 
+                print('here')
                 self.op = ChromeOptions()
                 self.op.add_argument('headless')
                 self.browser = Chrome(executable_path='/Users/macbook/chromedriver', options=self.op)
@@ -112,4 +113,3 @@ class SeleniumCrawler(object):
 
     def quit(self):
         self.browser.quit()
-
