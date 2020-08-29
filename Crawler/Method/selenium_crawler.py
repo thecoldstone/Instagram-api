@@ -6,19 +6,22 @@ import re
 
 class SeleniumCrawler(object):
     
-    def __init__(self, usr, safari=False, firefox=False, headless=False):
+    def __init__(self, usr, browser=None, headless=False):
 
         self.BASE_URL = "https://www.instagram.com/"
 
-        if safari:
+        if browser == "safari":
 
             self.browser = Safari()
+
+        elif browser == "firefox":
+
+            pass
 
         else:
             # Open in headless mode
             if headless is True:
 
-                print('here')
                 self.op = ChromeOptions()
                 self.op.add_argument('headless')
                 self.browser = Chrome(executable_path='/Users/macbook/chromedriver', options=self.op)
@@ -58,13 +61,13 @@ class SeleniumCrawler(object):
 
         success = self.browser.find_elements_by_xpath('//*[@id="slfErrorAlert"]')
 
-        print(success)
-
         if len(success) is 0:
 
-            # Don't save credentials
-            self.browser.find_element_by_xpath('//*[@id="react-root"]/section/main/div/div/div/div/button').click()
-            self.logged_in = True
+            time.sleep(2)
+
+            self.browser.get(self.BASE_URL + usr)
+
+            return True, 'Success'
 
         else:
 
@@ -73,7 +76,13 @@ class SeleniumCrawler(object):
             }
 
     def get_posts(self):
-        xpath_posts = '//*[@id="react-root"]/section/main/div/header/section/ul/li[1]/a'
+
+        if self.logged_in:
+            xpath_posts = '//*[@id="react-root"]/section/main/div/header/section/ul/li[1]/span'
+
+        else:
+            xpath_posts = '//*[@id="react-root"]/section/main/div/header/section/ul/li[1]/a/span'
+
         return self.browser.find_element_by_xpath(xpath_posts).text
     
     def get_followers(self):
@@ -88,11 +97,27 @@ class SeleniumCrawler(object):
         xpath_biography = '//*[@id="react-root"]/section/main/div/header/section/div[2]'
         return self.browser.find_element_by_xpath(xpath_biography).text
 
-    def get_all_posts(self):
+    def get_all_posts(self, limit):
+
+        from selenium.webdriver.common.keys import Keys
+
+        html = self.browser.find_element_by_tag_name('html')
+
         posts = []
-        for a in self.browser.find_elements_by_tag_name('a'):
-            if 'https://www.instagram.com/p/' in a.get_attribute('href'):
-                posts.append(a.get_attribute('href'))
+
+        while len(posts) < limit:
+
+            links = [a.get_attribute('href') for a in self.browser.find_elements_by_tag_name('a')]
+
+            for link in links:
+
+                if 'https://www.instagram.com/p/' in link and link not in posts:
+                    posts.append(link)
+
+            html.send_keys(Keys.END)
+
+            time.sleep(0.5)
+
         return posts
 
     def get_likes(self, post):

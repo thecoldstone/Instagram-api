@@ -1,13 +1,19 @@
 class User:
-    def __init__(self, username):
-        self.username = username
+    def __init__(self, **kwargs):
+
+        for key, value in kwargs.items():
+            if 'usr' is key:
+                self.usr = value
+            if 'pwd' is key:
+                self.pwd = value
+
         self.posts = None
         self.followers = None
         self.following = None
-        self.biography = None
-    
+        self.post = []
+
     def __repr__(self):
-        return {'account':self.username, 'posts':self.posts, 'followers':self.followers, 'following':self.following}
+        return {'usr':self.usr, 'pwd':self.pwd, 'posts':self.posts, 'followers':self.followers, 'following':self.following}
 
     def __str__(self):
-        return 'User(account='+self.username+', posts='+str(self.posts)+', followers='+str(self.followers)+', following='+str(self.following)+ ')'
+        return 'User(usr='+self.usr+', pwd='+self.pwd+')'

@@ -1,17 +1,19 @@
+from user import User
+
+
 class Crawler:
 
-    def __init__(self, method=None):
+    def __init__(self, method=None, usr=None, pwd=""):
         '''
         :param crawler_method - method which app will crawl data 
         '''
         self.method = method
+        self.usr = User(usr=usr, pwd=pwd)
 
-    # Getter function
     @property
     def crawler_method(self):
         return self.method
 
-    # Setter function
     @crawler_method.setter
     def crawler_method(self, method):
 
@@ -24,23 +26,38 @@ class Crawler:
         else:
             self.method = None
 
-    def crawl(self, usr, headless=False):
+    @property
+    def username(self):
+        return self.usr.usr
+
+    @username.setter
+    def username(self, usr):
+        self.usr.usr = usr
+
+    @property
+    def password(self):
+        return self.usr.pwd
+
+    @password.setter
+    def password(self, pwd):
+        self.usr.pwd = pwd
+
+    def crawl(self, headless=False):
         '''
         :param usr - username to crawl
         :param headless - do not open browser
         '''
 
         if self.crawler_method == 'bs4':
-            return self.crawl_with_bs4(usr)
+            return self.crawl_with_bs4()
 
         if self.crawler_method == 'selenium':
-            return self.crawl_with_selenium(usr, headless)
+            return self.crawl_with_selenium(headless)
 
         # def crawl_with_bs4(usr):
         #     pass
 
-    @staticmethod
-    def crawl_with_bs4(usr):
+    def crawl_with_bs4(self):
         '''
         :param usr: username to crawl
         :return:
@@ -48,23 +65,20 @@ class Crawler:
         from Crawler.Method.bs4_crawler import crawl
         pass
 
-    @staticmethod
-    def crawl_with_selenium(usr, headless=False, to_login=False):
+    def crawl_with_selenium(self, headless=False):
         '''
-        :param usr: username to crawl
         :param headless: do not open browser
-        :param to_login: whether user wants to log in and scrap closed account
         :return: dictionary with user's information
         '''
 
         # Import needed Selenium class
         from Crawler.Method.selenium_crawler import SeleniumCrawler
 
-        selenium = SeleniumCrawler(usr, headless=headless)
+        selenium = SeleniumCrawler(self.username, headless=headless)
 
-        if to_login is True:
+        if len(self.password) > 0:
 
-            selenium.logged_in, response = selenium.log_in('nike', 'sdad')
+            selenium.logged_in, response = selenium.log_in(self.username, self.password)
 
             if selenium.logged_in is False and len(response) > 0:
                 return None, response['response']
@@ -73,10 +87,10 @@ class Crawler:
             return None, 'Username is not found.'
 
         return {
-            'username': usr,
+            'username': self.username,
             'posts': selenium.get_posts(),
             'followers': selenium.get_followers(),
             'following': selenium.get_following(),
             'biography': selenium.get_account_biography(),
-            'post' : selenium.get_all_posts()
+            'post': selenium.get_all_posts(limit=28)
         }, 'Successful'

@@ -11,8 +11,11 @@ def index():
     crawler = Crawler()
 
     if 'username' in args:
-        username = request.args.get('username')
+
+        crawler.username = request.args.get('username')
+
     else:
+
         return jsonify({
             'response': {
                 'username': 'Not defined.'
@@ -37,18 +40,25 @@ def index():
                 }
             }), 404
 
-    # # Whether crawl method does not exist or not yet implemented
+    # Whether crawl method does not exist or not yet implemented
     if crawler.method is None:
+
         return jsonify({
             'response': {
                 'method': '{0} {1} {2}'.format('Method', request.args.get('method'), 'does not exist')
             }
         }), 404
 
+    # Whether the user wants to log in and scrap his own private account
+    if 'pwd' in args:
+
+        crawler.password = request.args.get('pwd')
+
     # Crawl Instagram username
-    result, respond = crawler.crawl(username, headless=True)
+    result, respond = crawler.crawl(headless=True)
 
     if result is None:
+
         return jsonify({
             'response': {
                 'method': request.args.get('method'),
@@ -71,5 +81,6 @@ def index():
     }), 200
 
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
+
     app.run(debug=True)
