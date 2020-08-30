@@ -9,6 +9,7 @@ class Crawler:
         '''
         self.method = method
         self.usr = User(usr=usr, pwd=pwd)
+        self.limit = None
 
     @property
     def crawler_method(self):
@@ -56,16 +57,10 @@ class Crawler:
         if self.crawler_method == 'selenium':
             return self.crawl_with_selenium(headless)
 
-        # def crawl_with_bs4(usr):
-        #     pass
-
     def crawl_with_bs4(self):
-        '''
-        :param usr: username to crawl
-        :return:
-        '''
         from Crawler.Method.bs4_crawler import crawl
-        pass
+
+        return None, 'Not implemented yet'
 
     def crawl_with_selenium(self, headless=False):
         '''
@@ -88,11 +83,14 @@ class Crawler:
         if selenium.status is not 200:
             return None, 'Username is not found.'
 
+        if self.limit is None:
+            self.limit = int(selenium.get_posts())
+
         return {
             'username': self.username,
             'posts': selenium.get_posts(),
             'followers': selenium.get_followers(),
             'following': selenium.get_following(),
             'biography': selenium.get_account_biography(),
-            'post': selenium.get_all_posts(limit=28)
+            'post': selenium.get_all_posts(self.limit)
         }, 'Successful'

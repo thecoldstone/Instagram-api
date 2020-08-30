@@ -48,6 +48,20 @@ def index():
                 }
             }), 404
 
+    if 'limit' in args:
+
+        try:
+
+            crawler.limit = int(request.args.get('limit'))
+
+        except ValueError:
+
+            return jsonify({
+                'response': {
+                    'error': 'Limit is not integer type.'
+                }
+            }), 404
+
     # Whether the user wants to log in and scrap his own private account
     if 'pwd' in args:
 

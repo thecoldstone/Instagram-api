@@ -1,4 +1,4 @@
-from selenium.webdriver import Safari, Chrome, ChromeOptions
+from selenium.webdriver import Safari, Chrome, Firefox, ChromeOptions
 import time
 from requests import get
 import os
@@ -12,33 +12,38 @@ class SeleniumCrawler(object):
 
         if browser == "safari":
 
+            # TODO
+            # Not optimized yet
             self.browser = Safari()
 
         elif browser == "firefox":
 
-            pass
+            # TODO
+            # Not optimized yet
+            self.browser = Firefox()
 
-        else:
+        else:  # Chrome
+
+            if not os.path.exists("path_chromedriver.txt"):
+                raise IOError("Path to chromedriver is missing.")
+
+            # Your path to chromedriver
+            with open("path_chromedriver.txt", "r") as f:
+                path_chromedriver = f.readline()
+
+            f.close()
+
             # Open in headless mode
             if headless is True:
 
                 self.op = ChromeOptions()
                 self.op.add_argument('headless')
 
-                if not os.path.exists("path_chromedriver.txt"):
-                    raise IOError("Path to chromedriver is missing.")
-
-                # Your path to chromedriver
-                with open("path_chromedriver.txt", "r") as f:
-                    path_chromedriver = f.readline()
-
-                f.close()
-
                 self.browser = Chrome(executable_path=path_chromedriver, options=self.op)
 
             else:
 
-                self.browser = Chrome(executable_path='/Users/macbook/chromedriver')
+                self.browser = Chrome(executable_path=path_chromedriver)
 
         self.browser.get(self.BASE_URL + usr)
         self.status = get(self.BASE_URL + usr).status_code
@@ -108,11 +113,21 @@ class SeleniumCrawler(object):
         return self.browser.find_element_by_xpath(xpath_biography).text
 
     def get_all_posts(self, limit):
+        '''
 
+        :param limit: limit of posts to fetch
+        :return: list of the links to the posts
+        '''
         from selenium.webdriver.common.keys import Keys
+        from selenium.common.exceptions import NoSuchElementException
 
-        if self.browser.find_element_by_xpath('//*[@id="react-root"]/section/main/div/div/article/div/div/h2').text == 'This Account is Private':
-            return []
+        try:
+            if self.browser.find_element_by_xpath('//*[@id="react-root"]/section/main/div/div/article/div/div/h2').text == "This Account is Private":
+                return []
+        except NoSuchElementException:
+            pass
+
+        time.sleep(2)
 
         html = self.browser.find_element_by_tag_name('html')
 
@@ -122,11 +137,25 @@ class SeleniumCrawler(object):
 
             links = [a.get_attribute('href') for a in self.browser.find_elements_by_tag_name('a')]
 
+            try:
+                # Return already gotten posts once the pop window appears that asks for logging in order to continue
+                if self.browser.find_element_by_xpath('/html/body/div[5]/div[1]'):
+                    print(len(posts))
+                    return posts
+
+            except NoSuchElementException:
+                pass
+
             for link in links:
 
                 if 'https://www.instagram.com/p/' in link and link not in posts:
+
+                    if len(posts) >= limit:
+                        break
+
                     posts.append(link)
 
+            # Scroll down html page to load content and get more posts
             html.send_keys(Keys.END)
 
             time.sleep(0.5)
