@@ -1,7 +1,7 @@
 from selenium.webdriver import Safari, Chrome, ChromeOptions
 import time
 from requests import get
-import re
+import os
 
 
 class SeleniumCrawler(object):
@@ -24,7 +24,17 @@ class SeleniumCrawler(object):
 
                 self.op = ChromeOptions()
                 self.op.add_argument('headless')
-                self.browser = Chrome(executable_path='/Users/macbook/chromedriver', options=self.op)
+
+                if not os.path.exists("path_chromedriver.txt"):
+                    raise IOError("Path to chromedriver is missing.")
+
+                # Your path to chromedriver
+                with open("path_chromedriver.txt", "r") as f:
+                    path_chromedriver = f.readline()
+
+                f.close()
+
+                self.browser = Chrome(executable_path=path_chromedriver, options=self.op)
 
             else:
 
@@ -100,6 +110,9 @@ class SeleniumCrawler(object):
     def get_all_posts(self, limit):
 
         from selenium.webdriver.common.keys import Keys
+
+        if self.browser.find_element_by_xpath('//*[@id="react-root"]/section/main/div/div/article/div/div/h2').text == 'This Account is Private':
+            return []
 
         html = self.browser.find_element_by_tag_name('html')
 

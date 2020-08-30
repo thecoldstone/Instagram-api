@@ -32,7 +32,9 @@ class Crawler:
 
     @username.setter
     def username(self, usr):
-        self.usr.usr = usr
+
+        if len(usr) > 0:
+            self.usr.usr = usr
 
     @property
     def password(self):

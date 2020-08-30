@@ -4,7 +4,7 @@ from Crawler.crawler import Crawler
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
 
     args = request.args
@@ -13,6 +13,14 @@ def index():
     if 'username' in args:
 
         crawler.username = request.args.get('username')
+
+        if crawler.username is None:
+
+            return jsonify({
+                'response': {
+                    'username': 'Not defined.'
+                }
+            }), 404
 
     else:
 
@@ -40,22 +48,13 @@ def index():
                 }
             }), 404
 
-    # Whether crawl method does not exist or not yet implemented
-    if crawler.method is None:
-
-        return jsonify({
-            'response': {
-                'method': '{0} {1} {2}'.format('Method', request.args.get('method'), 'does not exist')
-            }
-        }), 404
-
     # Whether the user wants to log in and scrap his own private account
     if 'pwd' in args:
 
         crawler.password = request.args.get('pwd')
 
     # Crawl Instagram username
-    result, respond = crawler.crawl(headless=True)
+    result, respond = crawler.crawl()
 
     if result is None:
 
