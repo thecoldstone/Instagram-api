@@ -10,6 +10,7 @@ class Crawler:
         self.method = method
         self.usr = User(usr=usr, pwd=pwd)
         self.limit = None
+        self.headless = False
 
     @property
     def crawler_method(self):
@@ -45,33 +46,66 @@ class Crawler:
     def password(self, pwd):
         self.usr.pwd = pwd
 
-    def crawl(self, headless=False):
-        '''
-        :param usr - username to crawl
-        :param headless - do not open browser
-        '''
+    @property
+    def limit_mode(self):
+        return self.limit
 
+    @limit_mode.setter
+    def limit_mode(self, limit):
+        try:
+
+            self.limit = int(limit)
+
+        except ValueError:
+
+            self.limit = None
+
+    @property
+    def headless_mode(self):
+        return self.headless
+
+    @headless_mode.setter
+    def headless_mode(self, flag):
+
+        try:
+
+            if int(flag) is 0 or int(flag) is 1:
+                if int(flag) is 0:
+                    self.headless = False
+                else:
+                    self.headless = True
+            else:
+                self.headless = None
+        except ValueError:
+            self.headless = None
+
+    def crawl(self):
+        '''
+        :return: dictionary with user's information
+        '''
         if self.crawler_method == 'bs4':
             return self.crawl_with_bs4()
 
         if self.crawler_method == 'selenium':
-            return self.crawl_with_selenium(headless)
+            return self.crawl_with_selenium()
 
     def crawl_with_bs4(self):
+        '''
+        :return: dictionary with user's information parsed/crawled by BeautifulSoup
+        '''
         from Crawler.Method.bs4_crawler import crawl
 
         return None, 'Not implemented yet'
 
-    def crawl_with_selenium(self, headless=False):
+    def crawl_with_selenium(self):
         '''
-        :param headless: do not open browser
-        :return: dictionary with user's information
+        :return: dictionary with user's information parsed/crawled by Selenium
         '''
 
         # Import needed Selenium class
         from Crawler.Method.selenium_crawler import SeleniumCrawler
 
-        selenium = SeleniumCrawler(self.username, headless=headless)
+        selenium = SeleniumCrawler(self.username, headless=self.headless)
 
         if len(self.password) > 0:
 
@@ -87,10 +121,11 @@ class Crawler:
             self.limit = int(selenium.get_posts())
 
         return {
+            'method': self.crawler_method,
             'username': self.username,
             'posts': selenium.get_posts(),
             'followers': selenium.get_followers(),
             'following': selenium.get_following(),
             'biography': selenium.get_account_biography(),
             'post': selenium.get_all_posts(self.limit)
-        }, 'Successful'
+        }, ''
