@@ -123,7 +123,7 @@ class SeleniumCrawler(object):
 
         try:
             if self.browser.find_element_by_xpath('//*[@id="react-root"]/section/main/div/div/article/div/div/h2').text == "This Account is Private":
-                return []
+                return 'This Account is Private'
         except NoSuchElementException:
             pass
 
@@ -140,7 +140,6 @@ class SeleniumCrawler(object):
             try:
                 # Return already gotten posts once the pop window appears that asks for logging in order to continue
                 if self.browser.find_element_by_xpath('/html/body/div[5]/div[1]'):
-                    print(len(posts))
                     return posts
 
             except NoSuchElementException:

@@ -36,13 +36,15 @@ def index():
     return jsonify({
         'response': {
             'object': {
-                'method': result['method'],
                 'username': result['username'],
                 'posts': result['posts'],
                 'followers': result['followers'],
                 'following': result['following'],
                 'biography': result['biography'],
                 'post': result['post']
+            },
+            'settings': {
+                'method': result['method']
             }
         }
     }), 200
