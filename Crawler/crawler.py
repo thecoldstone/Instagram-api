@@ -67,16 +67,19 @@ class Crawler:
     @headless_mode.setter
     def headless_mode(self, flag):
 
-        try:
+        if flag == 'y':
+            self.headless = True
 
-            if int(flag) is 0 or int(flag) is 1:
-                if int(flag) is 0:
-                    self.headless = False
-                else:
-                    self.headless = True
+        elif flag == 'n':
+            self.headless = False
+
+        elif int(flag) is 0 or int(flag) is 1:
+            if int(flag) is 0:
+                self.headless = False
             else:
-                self.headless = None
-        except ValueError:
+                self.headless = True
+
+        else:
             self.headless = None
 
     def crawl(self):

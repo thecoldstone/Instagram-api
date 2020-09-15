@@ -6,6 +6,3 @@ venv
 .idea
 
 path_chromedriver.txt
-
-Forms
-templates
