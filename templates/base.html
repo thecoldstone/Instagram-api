@@ -1,11 +1,18 @@
-<!DOCTYPE html>
+{% extends "bootstrap/base.html" %}
+
 <html>
 <head>
     <title>{% block title %} {% endblock %} - IApi</title>
     <meta charset="utf-8">
+    
+    <!-- My CSS styles -->
+    <link rel="stylesheet" href="{{ url_for('.static', filename = 'style.css') }}">
+
 </head>
 <body>
     {% block content %}
+    <!-- Content of the page goes up there -->
     {% endblock %}
+
 </body>
 </html>

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %} Start {% endblock %}
 
@@ -6,37 +7,42 @@
 
 <div class="container">
 
-    <h1>API for fetching intstagram's accounts</h1>
+    <h1>API for fetching Instagram's data</h1>
 
-    <div class="form-wrapper">
-        <form method="GET" action="/">
-            <!--{{ form.hidden_tag() }}-->
-            <!--{% if form.errors %}-->
-                <!--{{ form.errors }}-->
-            <!--{% endif %}-->
-            <div class="form-field">{{ form.username.label }} {{ form.username }}
-                {% if form.username.errors %}
-                    <ul class="errors">
-                        {% for error in form.username.errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+    <form action="/" method="get" class="form" role="form">
+
+        <div class="row">
+            <div class="form-group col-md-3 col-sm-3">
+                {{ wtf.form_field(form.username, class='form-control', placeholder='Enter username') }}
             </div>
-            <div class="form-field">{{ form.method.label }} {{ form.method }}</div>
-            <div class="form-field">{{ form.limit.label }} {{ form.limit }}
-                {% if form.limit.errors %}
-                    <ul class="errors">
-                        {% for error in form.limit.errors %}
-                            <li><h3>Error</h3> {{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+
+            <!--<div class="form-group col-md-3 col-sm-3">-->
+                <!--{{ wtf.form_field(form.password, class='form-control', placeholder='Enter password (Optional)') }}-->
+            <!--</div>-->
+
+            <div class="form-group col-md-3 col-sm-3">
+                {{ wtf.form_field(form.method) }}
             </div>
-            <div class="form-field">{{ form.headless.label }} {{ form.headless }}</div>
-            {{ form.submit }}
-        </form>
-    </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-3 col-sm-3">
+                {{ wtf.form_field(form.limit, class='form-control', placeholder='Enter integer value') }}
+            </div>
+
+            <div class="form-group col-md-3 col-sm-3">
+                {{ wtf.form_field(form.browser) }}
+            </div>
+
+
+            <div class="form-group col-md-3 col-sm-3">
+                {{ wtf.form_field(form.headless) }}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Fetch</button>
+
+    </form>
 
 </div>
 

@@ -29,6 +29,10 @@ class API:
                     'username': 'Not defined.'
                 }
 
+        # TODO
+        if 'pwd' in args:
+            self.crawler.password = request.args.get('pwd')
+
         if 'method' in args:
 
             self.crawler.crawler_method = request.args.get('method')
@@ -53,9 +57,15 @@ class API:
                         'limit': 'Limit is not integer type.'
                     }
 
-        # Whether the user wants to log in and scrap his own private account
-        if 'pwd' in args:
-            self.crawler.password = request.args.get('pwd')
+        # Not all browsers are still supported
+        if 'browser' in args:
+
+            self.crawler.browser = request.args.get('browser')
+
+            if self.crawler.browser is None:
+                return {
+                    'browser': 'Browser has not been defined.'
+                }
 
         if 'headless' in args:
 
@@ -63,7 +73,7 @@ class API:
 
             if self.crawler.headless_mode is None:
                 return {
-                        'headless': 'Headless mode is supposed to be an integer value between 0 or 1.'
+                        'headless': 'Headless mode is supposed to be an integer value between (0 or 1) or (y or n).'
                     }
 
     def fetch(self):

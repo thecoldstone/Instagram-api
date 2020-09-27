@@ -69,7 +69,7 @@ class SeleniumCrawler(object):
         except NoSuchElementException:
 
             return False, {
-                'response' : 'Unable to locate element to log in.'
+                'response': 'Unable to locate element to log in.'
             }
 
         time.sleep(2)
@@ -87,7 +87,7 @@ class SeleniumCrawler(object):
         else:
 
             return False,  {
-                'response' : self.browser.find_element_by_xpath('//*[@id="slfErrorAlert"]').text
+                'response': self.browser.find_element_by_xpath('//*[@id="slfErrorAlert"]').text
             }
 
     def get_posts(self):

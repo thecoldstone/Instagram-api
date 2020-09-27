@@ -1,16 +1,19 @@
 from user import User
 
+BROWSERS = ('chrome', 'safari', 'firefox')
+
 
 class Crawler:
 
     def __init__(self, method=None, usr=None, pwd=""):
         '''
-        :param crawler_method - method which app will crawl data 
+        :param method - method which app will crawl data
         '''
         self.method = method
         self.usr = User(usr=usr, pwd=pwd)
         self.limit = None
         self.headless = False
+        self._browser = None
 
     @property
     def crawler_method(self):
@@ -61,23 +64,44 @@ class Crawler:
             self.limit = None
 
     @property
+    def browser(self):
+        return self._browser
+
+    @browser.setter
+    def browser(self, browser):
+
+        if browser in BROWSERS:
+            self._browser = browser
+        else:
+            self._browser = None
+
+    @property
     def headless_mode(self):
         return self.headless
 
     @headless_mode.setter
     def headless_mode(self, flag):
 
-        if flag == 'y':
-            self.headless = True
+        if type(flag) == str:
 
-        elif flag == 'n':
-            self.headless = False
-
-        elif int(flag) is 0 or int(flag) is 1:
-            if int(flag) is 0:
-                self.headless = False
-            else:
+            if flag == 'y':
                 self.headless = True
+
+            elif flag == 'n':
+                self.headless = False
+
+            else:
+                self.headless = None
+
+        elif type(flag) == int:
+
+            if int(flag) == 0 or int(flag) == 1:
+
+                if int(flag) == 0:
+                    self.headless = False
+
+                else:
+                    self.headless = True
 
         else:
             self.headless = None
@@ -96,9 +120,25 @@ class Crawler:
         '''
         :return: dictionary with user's information parsed/crawled by BeautifulSoup
         '''
-        from Crawler.Method.bs4_crawler import crawl
+        from Crawler.Method.bs4_crawler import BS4
 
-        return None, 'Not implemented yet'
+        bs4 = BS4(self.username)
+
+        if bs4.status != 200:
+
+            return None, f'Username {self.username} is not found'
+
+        result = bs4.fetch_data()
+
+        return {
+            'method': self.crawler_method,
+            'username': self.username,
+            'posts': result['posts'],
+            'followers': result['followers'],
+            'following': result['following'],
+            'biography': '',
+            'post': ''
+        }, ''
 
     def crawl_with_selenium(self):
         '''
@@ -110,15 +150,15 @@ class Crawler:
 
         selenium = SeleniumCrawler(self.username, headless=self.headless)
 
+        if selenium.status != 200:
+            return None, f'Username {self.username} is not found.'
+
         if len(self.password) > 0:
 
             selenium.logged_in, response = selenium.log_in(self.username, self.password)
 
             if selenium.logged_in is False and len(response) > 0:
                 return None, response['response']
-
-        if selenium.status is not 200:
-            return None, 'Username is not found.'
 
         if self.limit is None:
             self.limit = int(selenium.get_posts())

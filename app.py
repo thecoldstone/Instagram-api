@@ -1,16 +1,27 @@
 from flask import Flask, jsonify, request
 from flask import render_template, redirect, url_for
 from flask_wtf.csrf import CSRFProtect
+from flask_bootstrap import Bootstrap
 from Crawler.api import API
 import os
 
-csrf = CSRFProtect()
 
-app = Flask(__name__)
-csrf.init_app(app)
+def create_app():
 
-SECRET_KEY = os.urandom(32)
-app.config['SECRET_KEY'] = SECRET_KEY
+    csrf = CSRFProtect()
+    app = Flask(__name__)
+
+    csrf.init_app(app)
+
+    SECRET_KEY = os.urandom(32)
+    app.config['SECRET_KEY'] = SECRET_KEY
+
+    Bootstrap(app)
+
+    return app
+
+
+app = create_app()
 
 
 @app.route('/welcome', methods=('GET', 'POST'))
@@ -22,7 +33,7 @@ def welcome_page():
     from Forms.SearchForm import SearchForm
 
     # Using meta to disable the appearing of csrf in url
-    search = SearchForm(meta={'csrf': False})
+    search = SearchForm()
 
     # Once form has been submitted
     if search.validate_on_submit():
@@ -45,7 +56,7 @@ def index():
     args = request.args
 
     # If query string has been omitted we render welcome template
-    if len(args) is 0:
+    if len(args) == 0:
         return redirect(url_for('welcome_page'))
 
     # Initialize API
@@ -90,4 +101,4 @@ def index():
 
 if __name__ == "__main__":
 
-    app.run(debug=True)
+    app.run()
